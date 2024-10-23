@@ -1,5 +1,4 @@
-ALTER USER GIISGBD109 IDENTIFIED BY PRACTICAS2025;
-
+-- Práctica 1 - SGBD: Alberto Játiva y Mario Gil
 -- Ejercicio 1: Creación de tablas e inserción de datos
 CREATE TABLE PAISES (
     ID_PAIS NUMBER PRIMARY KEY,
