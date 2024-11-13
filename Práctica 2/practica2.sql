@@ -255,18 +255,305 @@ BEGIN
         TABNAME=>'ACTORES'
     );
 END;
-
+/
 BEGIN
     DBMS_STATS.DELETE_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
         TABNAME=>'PELICULAS'
     );
 END;
-
+/
 BEGIN
     DBMS_STATS.DELETE_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
         TABNAME=>'ACTUACION'
     );
 END;
+/
+
+-- Consultar información de las tablas
+SELECT 
+    table_name AS "Nom",
+    num_rows AS "Nombre de files",
+    blocks AS "Nombre de blocs",
+    avg_row_len AS "Longitud mitjana dels registres"
+FROM 
+    user_tables
+WHERE 
+    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+
+-- Consultar información de las columnas
+SELECT 
+    table_name AS "Nom de taula",
+    column_name AS "Nom de columna",
+    num_distinct AS "Quantitat de valors diferents",
+    low_value AS "Valor mínim",
+    high_value AS "Valor màxim",
+    num_nulls AS "Nombre de nuls",
+    avg_col_len AS "Longitud mitjana de la columna",
+    histogram AS "Histograma"
+FROM 
+    user_tab_col_statistics
+WHERE 
+    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+
+-- Consultar información de los índices
+SELECT 
+    index_name AS "Nom",
+    table_name AS "Taula",
+    blevel AS "Profunditat",
+    leaf_blocks AS "Blocs en les fulles",
+    distinct_keys AS "Quantitat de claus diferents",
+    avg_leaf_blocks_per_key AS "Mitjana de blocs fulla per clau",
+    avg_data_blocks_per_key AS "Mitjana de blocs de dades per clau",
+    clustering_factor AS "Factor de clustering",
+    num_rows AS "Nombre de registres"
+FROM 
+    user_ind_statistics
+WHERE 
+    index_name IN ('IDX_SEXO', 'IDX_ANYO');
+
+-- Ejercicio 2:
+-- Consulta a utilizar 1
+SELECT *  
+FROM PELICULAS  
+WHERE ANYO > 1992; 
+-- Consulta a utilizar 2
+SELECT *  
+FROM PELICULAS P, ACTUACION ACT  
+WHERE P.OID = ACT.PELI  
+AND ANYO > 1992; 
+-- Consulta a utilizar 3
+SELECT P.*  
+FROM ACTORES A, ACTUACION X, PELICULAS P  
+WHERE A.NOM = ’Loy, Myrna’  
+AND A.OID = X.ACTOR  
+AND P.OID = X.PELI;
+
+-- PLANOS DE EJECUCIÓN:
+-- Plano de ejecución de la consulta 1
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS
+WHERE ANYO > 1992;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  1844 |   410K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  1844 |   410K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO">1992)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+'   - SQL plan baseline "SQL_PLAN_37ncmpadunta7d6672d41" used for this statement'
+*/
+
+-- Plano de ejecución de la consulta 2
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS P, ACTUACION ACT
+WHERE P.OID = ACT.PELI
+AND ANYO > 1992;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 3550993981'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation             | Name          | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT      |               |  2302 |   800K|   204   (0)| 00:00:01 |'
+'|*  1 |  HASH JOIN            |               |  2302 |   800K|   204   (0)| 00:00:01 |'
+'|*  2 |   TABLE ACCESS FULL   | PELICULAS     |  1844 |   410K|   102   (0)| 00:00:01 |'
+'|   3 |   INDEX FAST FULL SCAN| SYS_C00313005 | 14408 |  1801K|   102   (0)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("P"."OID"="ACT"."PELI")'
+'   2 - filter("ANYO">1992)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+'   - SQL plan baseline "SQL_PLAN_5rbfp05f7uk3m7c4a039a" used for this statement'
+*/
+
+-- Plano de ejecución de la consulta 3
+EXPLAIN PLAN FOR
+SELECT P.*
+FROM ACTORES A, ACTUACION X, PELICULAS P
+WHERE A.NOM = 'Loy, Myrna'
+AND A.OID = X.ACTOR
+AND P.OID = X.PELI;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1413788855'
+' '
+'----------------------------------------------------------------------------------------------'
+'| Id  | Operation                    | Name          | Rows  | Bytes | Cost (%CPU)| Time     |'
+'----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT             |               |     8 |  2952 |    80   (0)| 00:00:01 |'
+'|   1 |  NESTED LOOPS                |               |     8 |  2952 |    80   (0)| 00:00:01 |'
+'|   2 |   NESTED LOOPS               |               |     9 |  2952 |    80   (0)| 00:00:01 |'
+'|   3 |    NESTED LOOPS              |               |     9 |  1269 |    71   (0)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL        | ACTORES       |     3 |   345 |    68   (0)| 00:00:01 |'
+'|*  5 |     INDEX RANGE SCAN         | SYS_C00313005 |     3 |    78 |     1   (0)| 00:00:01 |'
+'|*  6 |    INDEX UNIQUE SCAN         | SYS_C00313001 |     1 |       |     0   (0)| 00:00:01 |'
+'|   7 |   TABLE ACCESS BY INDEX ROWID| PELICULAS     |     1 |   228 |     1   (0)| 00:00:01 |'
+'----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   4 - filter("A"."NOM"='Loy, Myrna')'
+'   5 - access("A"."OID"="X"."ACTOR")'
+'   6 - access("P"."OID"="X"."PELI")'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+'   - SQL plan baseline "SQL_PLAN_4z5x6suxn6hpc21f1959c" used for this statement'
+*/
+
+
+-- Significado de “Note - dynamic sampling used for this statement”. 
+/*
+Sirve para recopilar estadísticas en tiempo de ejecución, mejorando así la precisión de las 
+estimaciones de cardinalidad y costos. Esto ayuda al optimizador a seleccionar un 
+plan de ejecución más eficiente.
+*/
+
+-- Crear estadísticas
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'PELICULAS',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+/
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTUACION',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+/
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+/
+
+-- Volver a obtener plano de ejecución
+
+-- RESULTADOS:
+-- Consulta 1:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  1999 |   409K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  1999 |   409K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO">1992)'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_37ncmpadunta7d6672d41" used for this statement'
+*/
+
+-- Consulta 2:
+/*
+'Plan hash value: 3550993981'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation             | Name          | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT      |               |  2235 |   700K|   186   (0)| 00:00:01 |'
+'|*  1 |  HASH JOIN            |               |  2235 |   700K|   186   (0)| 00:00:01 |'
+'|*  2 |   TABLE ACCESS FULL   | PELICULAS     |  1999 |   409K|   102   (0)| 00:00:01 |'
+'|   3 |   INDEX FAST FULL SCAN| SYS_C00313005 | 12500 |  1354K|    84   (0)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("P"."OID"="ACT"."PELI")'
+'   2 - filter("ANYO">1992)'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_5rbfp05f7uk3m7c4a039a" used for this statement'
+*/
+
+-- Consulta 3:
+/*
+'Plan hash value: 1413788855'
+' '
+'----------------------------------------------------------------------------------------------'
+'| Id  | Operation                    | Name          | Rows  | Bytes | Cost (%CPU)| Time     |'
+'----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT             |               |     1 |   326 |    70   (0)| 00:00:01 |'
+'|   1 |  NESTED LOOPS                |               |     1 |   326 |    70   (0)| 00:00:01 |'
+'|   2 |   NESTED LOOPS               |               |     1 |   326 |    70   (0)| 00:00:01 |'
+'|   3 |    NESTED LOOPS              |               |     1 |   116 |    69   (0)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL        | ACTORES       |     1 |   106 |    68   (0)| 00:00:01 |'
+'|*  5 |     INDEX RANGE SCAN         | SYS_C00313005 |     1 |    10 |     1   (0)| 00:00:01 |'
+'|*  6 |    INDEX UNIQUE SCAN         | SYS_C00313001 |     1 |       |     0   (0)| 00:00:01 |'
+'|   7 |   TABLE ACCESS BY INDEX ROWID| PELICULAS     |     1 |   210 |     1   (0)| 00:00:01 |'
+'----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   4 - filter("A"."NOM"='Loy, Myrna')'
+'   5 - access("A"."OID"="X"."ACTOR")'
+'   6 - access("P"."OID"="X"."PELI")'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_4z5x6suxn6hpc21f1959c" used for this statement'
+*/
+
+-- Conclusiones: Cambios respecto a los planes anteriores sin estadísticas
+/*
+- Ausencia de muestreo dinámico
+- Reducción del coste de las consultas cuando 
+se utilizan estadísticas precisas.
+*/
+
 
