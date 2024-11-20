@@ -779,3 +779,14 @@ END;
 */
 
 -- Conclusiones: Cambios respecto a los planes anteriores sin estadísticas
+/*
+La principal diferencia entre las consultas con y sin estadísticas es la 
+precisión de las estimaciones de filas y bytes. Con estadísticas, el optimizador 
+puede hacer estimaciones más precisas, lo que puede llevar a una mejor selección 
+del plan de ejecución. Sin estadísticas, el optimizador debe recurrir al 
+muestreo dinámico para recopilar datos en tiempo de ejecución, lo que puede 
+resultar en estimaciones menos precisas.
+*/
+
+
+
