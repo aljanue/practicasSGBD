@@ -436,7 +436,7 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 */
 
 
--- Significado de “Note - dynamic sampling used for this statement”. 
+-- Significado de “Note - dynamic sampling used for this statement�?. 
 /*
 Sirve para recopilar estadísticas en tiempo de ejecución, mejorando así la precisión de las 
 estimaciones de cardinalidad y costos. Esto ayuda al optimizador a seleccionar un 
@@ -787,6 +787,68 @@ del plan de ejecución. Sin estadísticas, el optimizador debe recurrir al
 muestreo dinámico para recopilar datos en tiempo de ejecución, lo que puede 
 resultar en estimaciones menos precisas.
 */
+-- Ejercicio 4
+drop table actores;
+insert into actores select * from giisgbd.actores_datos1;
 
+SELECT * FROM ACTORES WHERE SEXO = 'H';
+SELECT COUNT(*) FROM ACTORES WHERE SEXO = 'H';
+-- Generar les estad�stiques adequades (per a les taules que intervenen en les consultes). 
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD108',
+        TABNAME=>'ACTORES',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+-- Obtenir el pla d'execuci� d'ambdues consultes.
+-- Consulta 1. Plano de ejecuci�n.
+EXPLAIN PLAN FOR
+SELECT *
+FROM ACTORES
+WHERE SEXO='H';
 
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+/*
+Plan hash value: 2765877494
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |  1172 |   123K|    13   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| ACTORES |  1172 |   123K|    13   (0)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("SEXO"='H')
+ 
+Note
+-----
+   - SQL plan baseline "SQL_PLAN_5sagc315vquw0c4135987" used for this statement
+*/
+-- Consulta 2. Plano de ejecuci�n.
+EXPLAIN PLAN FOR
+SELECT COUNT(*)
+FROM ACTORES
+WHERE SEXO='H';
 
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+/*
+Plan hash value: 3398582430
+ 
+------------------------------------------------------------------------------
+| Id  | Operation          | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |         |     1 |     2 |    13   (0)| 00:00:01 |
+|   1 |  SORT AGGREGATE    |         |     1 |     2 |            |          |
+|*  2 |   TABLE ACCESS FULL| ACTORES |  1172 |  2344 |    13   (0)| 00:00:01 |
+------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - filter("SEXO"='H')
+*/
