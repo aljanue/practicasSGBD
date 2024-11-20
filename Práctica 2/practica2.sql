@@ -701,3 +701,81 @@ END;
 
 -- Volver a obtener plano de ejecución
 -- Resultado CONSULTA 1:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |    89 | 18690 |   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |    89 | 18690 |   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"=1960)'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_1jdpsryxmw9bbd6672d41" used for this statement'
+*/
+
+-- Resultado CONSULTA 2:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  3989 |   818K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  3989 |   818K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"<1960)'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_311qg5amb8st0d6672d41" used for this statement'
+*/
+
+-- Resultado CONSULTA 3:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  7105 |  1457K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  7105 |  1457K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO">1960)'
+' '
+*/
+
+-- Resultado CONSULTA 4:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           | 11093 |  2274K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS | 11093 |  2274K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"<>1960)'
+' '
+*/
+
+-- Conclusiones: Cambios respecto a los planes anteriores sin estadísticas
