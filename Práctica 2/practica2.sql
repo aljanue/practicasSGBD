@@ -52,52 +52,58 @@ BEGIN
     );
 END;
 
-
-exec dbms_stats.gather_index_stats(ownname=>'GIISGBD109',indname=>'IDX_SEXO',FORCE =>TRUE);
-exec dbms_stats.gather_index_stats(ownname=>'GIISGBD109',indname=>'IDX_ANYO',FORCE =>TRUE);
-
+EXEC DBMS_STATS.GATHER_INDEX_STATS(
+    OWNNAME=>'GIISGBD109',
+    INDNAME=>'IDX_SEXO',
+    FORCE =>TRUE
+);
+EXEC DBMS_STATS.GATHER_INDEX_STATS(
+    OWNNAME=>'GIISGBD109',
+    INDNAME=>'IDX_ANYO',
+    FORCE =>TRUE
+);
+ 
 -- Comprobaciones
-SELECT 
-    table_name AS "Nom",
-    num_rows AS "Nombre de files",
-    blocks AS "Nombre de blocs",
-    avg_row_len AS "Longitud mitjana dels registres"
-FROM 
-    user_tables
-WHERE 
-    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
-
-SELECT 
-    table_name AS "Nom de taula",
-    column_name AS "Nom de columna",
-    num_distinct AS "Quantitat de valors diferents",
-    low_value AS "Valor mínim",
-    high_value AS "Valor màxim",
-    num_nulls AS "Nombre de nuls",
-    avg_col_len AS "Longitud mitjana de la columna",
-    histogram AS "Histograma"
-FROM 
-    user_tab_col_statistics
-WHERE 
-    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
-
-SELECT 
-    index_name AS "Nom",
-    table_name AS "Taula",
-    blevel AS "Profunditat",
-    leaf_blocks AS "Blocs en les fulles",
-    distinct_keys AS "Quantitat de claus diferents",
-    avg_leaf_blocks_per_key AS "Mitjana de blocs fulla per clau",
-    avg_data_blocks_per_key AS "Mitjana de blocs de dades per clau",
-    clustering_factor AS "Factor de clustering",
-    num_rows AS "Nombre de registres"
-FROM 
-    user_ind_statistics
-WHERE 
-    index_name IN ('IDX_SEXO', 'IDX_ANYO');
-
+SELECT
+    TABLE_NAME  AS "Nom",
+    NUM_ROWS    AS "Nombre de files",
+    BLOCKS      AS "Nombre de blocs",
+    AVG_ROW_LEN AS "Longitud mitjana dels registres"
+FROM
+    USER_TABLES
+WHERE
+    TABLE_NAME IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+SELECT
+    TABLE_NAME   AS "Nom de taula",
+    COLUMN_NAME  AS "Nom de columna",
+    NUM_DISTINCT AS "Quantitat de valors diferents",
+    LOW_VALUE    AS "Valor mínim",
+    HIGH_VALUE   AS "Valor màxim",
+    NUM_NULLS    AS "Nombre de nuls",
+    AVG_COL_LEN  AS "Longitud mitjana de la columna",
+    HISTOGRAM    AS "Histograma"
+FROM
+    USER_TAB_COL_STATISTICS
+WHERE
+    TABLE_NAME IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+SELECT
+    INDEX_NAME              AS "Nom",
+    TABLE_NAME              AS "Taula",
+    BLEVEL                  AS "Profunditat",
+    LEAF_BLOCKS             AS "Blocs en les fulles",
+    DISTINCT_KEYS           AS "Quantitat de claus diferents",
+    AVG_LEAF_BLOCKS_PER_KEY AS "Mitjana de blocs fulla per clau",
+    AVG_DATA_BLOCKS_PER_KEY AS "Mitjana de blocs de dades per clau",
+    CLUSTERING_FACTOR       AS "Factor de clustering",
+    NUM_ROWS                AS "Nombre de registres"
+FROM
+    USER_IND_STATISTICS
+WHERE
+    INDEX_NAME IN ('IDX_SEXO', 'IDX_ANYO');
+ 
 -- Resultados:
-/*
+
+ /*
 TABLAS=[
   {
     "Nom": "'ACTORES'",
@@ -237,18 +243,19 @@ INDICES=[
   }
 ]
 */
--- Conclusiones:
-/*
+ 
+ -- Conclusiones:
+
+ /*
 - Se ha creado un índice para SEXO y sólo existe 1 valor
 - Hay muchos actores (9146) para la cantidad de peliculas (11182) y actuaciones (12500)
 haciendo que la proporcion salga aprox a 1.2 actores por pelicula y 1.1 actuaciones por pelicula
 lo cual no es lógico, pues en una película actúan muchos actores y los actores actúan en muchas películas
 */
-
--- Eliminar els índexs i les estadístiques generades. 
+ 
+ -- Eliminar els índexs i les estadístiques generades.
 DROP INDEX IDX_SEXO;
 DROP INDEX IDX_ANYO;
-
 BEGIN
     DBMS_STATS.DELETE_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -256,6 +263,7 @@ BEGIN
     );
 END;
 /
+
 BEGIN
     DBMS_STATS.DELETE_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -263,6 +271,7 @@ BEGIN
     );
 END;
 /
+
 BEGIN
     DBMS_STATS.DELETE_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -272,63 +281,78 @@ END;
 /
 
 -- Consultar información de las tablas
-SELECT 
-    table_name AS "Nom",
-    num_rows AS "Nombre de files",
-    blocks AS "Nombre de blocs",
-    avg_row_len AS "Longitud mitjana dels registres"
-FROM 
-    user_tables
-WHERE 
-    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+SELECT
+    TABLE_NAME  AS "Nom",
+    NUM_ROWS    AS "Nombre de files",
+    BLOCKS      AS "Nombre de blocs",
+    AVG_ROW_LEN AS "Longitud mitjana dels registres"
+FROM
+    USER_TABLES
+WHERE
+    TABLE_NAME IN ('ACTORES', 'PELICULAS', 'ACTUACION');
 
 -- Consultar información de las columnas
-SELECT 
-    table_name AS "Nom de taula",
-    column_name AS "Nom de columna",
-    num_distinct AS "Quantitat de valors diferents",
-    low_value AS "Valor mínim",
-    high_value AS "Valor màxim",
-    num_nulls AS "Nombre de nuls",
-    avg_col_len AS "Longitud mitjana de la columna",
-    histogram AS "Histograma"
-FROM 
-    user_tab_col_statistics
-WHERE 
-    table_name IN ('ACTORES', 'PELICULAS', 'ACTUACION');
+SELECT
+    TABLE_NAME   AS "Nom de taula",
+    COLUMN_NAME  AS "Nom de columna",
+    NUM_DISTINCT AS "Quantitat de valors diferents",
+    LOW_VALUE    AS "Valor mínim",
+    HIGH_VALUE   AS "Valor màxim",
+    NUM_NULLS    AS "Nombre de nuls",
+    AVG_COL_LEN  AS "Longitud mitjana de la columna",
+    HISTOGRAM    AS "Histograma"
+FROM
+    USER_TAB_COL_STATISTICS
+WHERE
+    TABLE_NAME IN ('ACTORES', 'PELICULAS', 'ACTUACION');
 
 -- Consultar información de los índices
-SELECT 
-    index_name AS "Nom",
-    table_name AS "Taula",
-    blevel AS "Profunditat",
-    leaf_blocks AS "Blocs en les fulles",
-    distinct_keys AS "Quantitat de claus diferents",
-    avg_leaf_blocks_per_key AS "Mitjana de blocs fulla per clau",
-    avg_data_blocks_per_key AS "Mitjana de blocs de dades per clau",
-    clustering_factor AS "Factor de clustering",
-    num_rows AS "Nombre de registres"
-FROM 
-    user_ind_statistics
-WHERE 
-    index_name IN ('IDX_SEXO', 'IDX_ANYO');
+SELECT
+    INDEX_NAME              AS "Nom",
+    TABLE_NAME              AS "Taula",
+    BLEVEL                  AS "Profunditat",
+    LEAF_BLOCKS             AS "Blocs en les fulles",
+    DISTINCT_KEYS           AS "Quantitat de claus diferents",
+    AVG_LEAF_BLOCKS_PER_KEY AS "Mitjana de blocs fulla per clau",
+    AVG_DATA_BLOCKS_PER_KEY AS "Mitjana de blocs de dades per clau",
+    CLUSTERING_FACTOR       AS "Factor de clustering",
+    NUM_ROWS                AS "Nombre de registres"
+FROM
+    USER_IND_STATISTICS
+WHERE
+    INDEX_NAME IN ('IDX_SEXO', 'IDX_ANYO');
 
 -- Ejercicio 2:
 -- Consulta a utilizar 1
-SELECT *  
-FROM PELICULAS  
-WHERE ANYO > 1992; 
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO > 1992;
+
 -- Consulta a utilizar 2
-SELECT *  
-FROM PELICULAS P, ACTUACION ACT  
-WHERE P.OID = ACT.PELI  
-AND ANYO > 1992; 
+SELECT
+    *
+FROM
+    PELICULAS P,
+    ACTUACION ACT
+WHERE
+    P.OID = ACT.PELI
+    AND ANYO > 1992;
+
 -- Consulta a utilizar 3
-SELECT P.*  
-FROM ACTORES A, ACTUACION X, PELICULAS P  
-WHERE A.NOM = ’Loy, Myrna’  
-AND A.OID = X.ACTOR  
-AND P.OID = X.PELI;
+SELECT
+    P.*
+FROM
+    ACTORES A,
+    ACTUACION X,
+    PELICULAS P
+WHERE
+    A.NOM = ’LOY,
+    MYRNA’
+    AND A.OID = X.ACTOR
+    AND P.OID = X.PELI;
 
 -- PLANOS DE EJECUCIÓN:
 -- Plano de ejecución de la consulta 1
@@ -337,7 +361,10 @@ SELECT *
 FROM PELICULAS
 WHERE ANYO > 1992;
 
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
 
 -- Resultado:
 /*
@@ -368,7 +395,10 @@ FROM PELICULAS P, ACTUACION ACT
 WHERE P.OID = ACT.PELI
 AND ANYO > 1992;
 
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
 
 -- Resultado:
 /*
@@ -403,7 +433,10 @@ WHERE A.NOM = 'Loy, Myrna'
 AND A.OID = X.ACTOR
 AND P.OID = X.PELI;
 
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
 
 -- Resultado:
 /*
@@ -436,7 +469,7 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 */
 
 
--- Significado de “Note - dynamic sampling used for this statement�?. 
+-- Significado de “Note - dynamic sampling used for this statement�?.
 /*
 Sirve para recopilar estadísticas en tiempo de ejecución, mejorando así la precisión de las 
 estimaciones de cardinalidad y costos. Esto ayuda al optimizador a seleccionar un 
@@ -453,6 +486,7 @@ BEGIN
     );
 END;
 /
+
 BEGIN
     DBMS_STATS.GATHER_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -462,6 +496,7 @@ BEGIN
     );
 END;
 /
+
 BEGIN
     DBMS_STATS.GATHER_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -557,10 +592,33 @@ se utilizan estadísticas precisas.
 */
 
 -- Ejercicio 3
-SELECT * FROM PELICULAS WHERE ANYO=1960; 
-SELECT * FROM PELICULAS WHERE ANYO<1960; 
-SELECT * FROM PELICULAS WHERE ANYO>1960; 
-SELECT * FROM PELICULAS WHERE ANYO<>1960;
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO=1960;
+
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO<1960;
+
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO>1960;
+
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO<>1960;
 
 -- Borramos las estadísticas
 BEGIN
@@ -569,18 +627,25 @@ BEGIN
         TABNAME=>'PELICULAS'
     );
 END;
+ 
 
 -- Obtenenemos planos de ejecución sin estadísticas:
 -- Plano de ejecución de la consulta 1
 EXPLAIN PLAN FOR
-SELECT *
-FROM PELICULAS
-WHERE ANYO = 1960;
-
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO = 1960;
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
 -- Resultado:
-/*
+
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -600,17 +665,23 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 '   - dynamic statistics used: dynamic sampling (level=2)'
 '   - SQL plan baseline "SQL_PLAN_1jdpsryxmw9bbd6672d41" used for this statement'
 */
-
--- Plano de ejecución de la consulta 2
+ 
+ -- Plano de ejecución de la consulta 2
 EXPLAIN PLAN FOR
-SELECT *
-FROM PELICULAS
-WHERE ANYO < 1960;
-
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO < 1960;
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
 -- Resultado:
-/*
+
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -630,17 +701,23 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 '   - dynamic statistics used: dynamic sampling (level=2)'
 '   - SQL plan baseline "SQL_PLAN_311qg5amb8st0d6672d41" used for this statement'
 */
-
--- Plano de ejecución de la consulta 3
+ 
+ -- Plano de ejecución de la consulta 3
 EXPLAIN PLAN FOR
-SELECT *
-FROM PELICULAS
-WHERE ANYO > 1960;
-
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO > 1960;
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
 -- Resultado:
-/*
+
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -659,17 +736,23 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 '-----'
 '   - dynamic statistics used: dynamic sampling (level=2)'
 */
-
--- Plano de ejecución de la consulta 4
+ 
+ -- Plano de ejecución de la consulta 4
 EXPLAIN PLAN FOR
-SELECT *
-FROM PELICULAS
-WHERE ANYO <> 1960;
-
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-
+SELECT
+    *
+FROM
+    PELICULAS
+WHERE
+    ANYO <> 1960;
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
 -- Resultado:
-/*
+
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -688,8 +771,8 @@ SELECT * FROM table(DBMS_XPLAN.DISPLAY);
 '-----'
 '   - dynamic statistics used: dynamic sampling (level=2)'
 */
-
--- Creamos estadísticas
+ 
+ -- Creamos estadísticas
 BEGIN
     DBMS_STATS.GATHER_TABLE_STATS(
         OWNNAME=>'GIISGBD109',
@@ -698,10 +781,12 @@ BEGIN
         FORCE=>TRUE
     );
 END;
+ 
 
 -- Volver a obtener plano de ejecución
 -- Resultado CONSULTA 1:
-/*
+
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -720,9 +805,10 @@ END;
 '-----'
 '   - SQL plan baseline "SQL_PLAN_1jdpsryxmw9bbd6672d41" used for this statement'
 */
+ 
+ -- Resultado CONSULTA 2:
 
--- Resultado CONSULTA 2:
-/*
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -741,9 +827,10 @@ END;
 '-----'
 '   - SQL plan baseline "SQL_PLAN_311qg5amb8st0d6672d41" used for this statement'
 */
+ 
+ -- Resultado CONSULTA 3:
 
--- Resultado CONSULTA 3:
-/*
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -759,9 +846,10 @@ END;
 '   1 - filter("ANYO">1960)'
 ' '
 */
+ 
+ -- Resultado CONSULTA 4:
 
--- Resultado CONSULTA 4:
-/*
+ /*
 'Plan hash value: 2378278331'
 ' '
 '-------------------------------------------------------------------------------'
@@ -777,9 +865,10 @@ END;
 '   1 - filter("ANYO"<>1960)'
 ' '
 */
+ 
+ -- Conclusiones: Cambios respecto a los planes anteriores sin estadísticas
 
--- Conclusiones: Cambios respecto a los planes anteriores sin estadísticas
-/*
+ /*
 La principal diferencia entre las consultas con y sin estadísticas es la 
 precisión de las estimaciones de filas y bytes. Con estadísticas, el optimizador 
 puede hacer estimaciones más precisas, lo que puede llevar a una mejor selección 
@@ -787,30 +876,52 @@ del plan de ejecución. Sin estadísticas, el optimizador debe recurrir al
 muestreo dinámico para recopilar datos en tiempo de ejecución, lo que puede 
 resultar en estimaciones menos precisas.
 */
--- Ejercicio 4
-drop table actores;
-insert into actores select * from giisgbd.actores_datos1;
-
-SELECT * FROM ACTORES WHERE SEXO = 'H';
-SELECT COUNT(*) FROM ACTORES WHERE SEXO = 'H';
--- Generar les estad�stiques adequades (per a les taules que intervenen en les consultes). 
+ 
+ -- Ejercicio 4
+DROP TABLE ACTORES;
+INSERT INTO ACTORES
+    SELECT
+        *
+    FROM
+        GIISGBD.ACTORES_DATOS1;
+SELECT
+    *
+FROM
+    ACTORES
+WHERE
+    SEXO = 'H';
+SELECT
+    COUNT(*)
+FROM
+    ACTORES
+WHERE
+    SEXO = 'H';
+ 
+-- Generar les estad�stiques adequades (per a les taules que intervenen en les consultes).
 BEGIN
     DBMS_STATS.GATHER_TABLE_STATS(
-        OWNNAME=>'GIISGBD108',
+        OWNNAME=>'GIISGBD109',
         TABNAME=>'ACTORES',
         CASCADE=>TRUE,
         FORCE=>TRUE
     );
 END;
--- Obtenir el pla d'execuci� d'ambdues consultes.
--- Consulta 1. Plano de ejecuci�n.
-EXPLAIN PLAN FOR
-SELECT *
-FROM ACTORES
-WHERE SEXO='H';
+ 
 
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-/*
+-- Obtenir el pla d'execuci� d'ambdues consultes.
+-- Consulta 1. Plano de ejecuci�n.
+EXPLAIN PLAN FOR
+SELECT
+    *
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ /*
 Plan hash value: 2765877494
  
 -----------------------------------------------------------------------------
@@ -829,14 +940,20 @@ Note
 -----
    - SQL plan baseline "SQL_PLAN_5sagc315vquw0c4135987" used for this statement
 */
--- Consulta 2. Plano de ejecuci�n.
+ 
+ -- Consulta 2. Plano de ejecuci�n.
 EXPLAIN PLAN FOR
-SELECT COUNT(*)
-FROM ACTORES
-WHERE SEXO='H';
-
-SELECT * FROM table(DBMS_XPLAN.DISPLAY);
-/*
+SELECT
+    COUNT(*)
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ /*
 Plan hash value: 3398582430
  
 ------------------------------------------------------------------------------
@@ -852,3 +969,1146 @@ Predicate Information (identified by operation id):
  
    2 - filter("SEXO"='H')
 */
+ 
+ -- Crear l'índex de tipus B-Tree IDX_SEXO ON ACTORES (SEXO) i generar les estadístiques adequades.
+CREATE INDEX IDX_SEXO ON ACTORES (SEXO);
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+ 
+
+-- Tornar a obtenir el pla d'execució de les consultes.
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN FOR
+SELECT
+    *
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
+-- Resultado:
+
+ /*
+'Plan hash value: 2765877494'
+' '
+'-----------------------------------------------------------------------------'
+'| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-----------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |         |  1382 |   145K|    13   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| ACTORES |  1382 |   145K|    13   (0)| 00:00:01 |'
+'-----------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_5sagc315vquw0c4135987" used for this statement'
+*/
+ 
+ -- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN FOR
+SELECT
+    COUNT(*)
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
+-- Resultado:
+
+ /*
+'Plan hash value: 3805308972'
+' '
+'------------------------------------------------------------------------------'
+'| Id  | Operation         | Name     | Rows  | Bytes | Cost (%CPU)| Time     |'
+'------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |          |     1 |     2 |     3   (0)| 00:00:01 |'
+'|   1 |  SORT AGGREGATE   |          |     1 |     2 |            |          |'
+'|*  2 |   INDEX RANGE SCAN| IDX_SEXO |  1382 |  2764 |     3   (0)| 00:00:01 |'
+'------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   2 - access("SEXO"='H')'
+*/
+ 
+ -- Eliminar l'índex creat en el pas 3, i crear un nou índex sobre el mateix camp de la mateixa
+-- taula, però aquesta vegada de tipus BITMAP, generant de nou les estadístiques adequades.
+DROP INDEX IDX_SEXO;
+CREATE BITMAP INDEX IDX_SEXO ON ACTORES (SEXO);
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+ 
+
+-- Tornar a obtenir el pla d'execució de les consultes.
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN FOR
+SELECT
+    *
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
+-- Resultado:
+
+ /*
+'Plan hash value: 2765877494'
+' '
+'-----------------------------------------------------------------------------'
+'| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-----------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |         |  1382 |   145K|    13   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| ACTORES |  1382 |   145K|    13   (0)| 00:00:01 |'
+'-----------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_5sagc315vquw0c4135987" used for this statement'
+*/
+ 
+ -- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN FOR
+SELECT
+    COUNT(*)
+FROM
+    ACTORES
+WHERE
+    SEXO='H';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+ 
+-- Resultado:
+
+ /*
+'Plan hash value: 2453959698'
+' '
+'------------------------------------------------------------------------------------------'
+'| Id  | Operation                     | Name     | Rows  | Bytes | Cost (%CPU)| Time     |'
+'------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT              |          |     1 |     2 |     1   (0)| 00:00:01 |'
+'|   1 |  SORT AGGREGATE               |          |     1 |     2 |            |          |'
+'|   2 |   BITMAP CONVERSION COUNT     |          |  1382 |  2764 |     1   (0)| 00:00:01 |'
+'|*  3 |    BITMAP INDEX FAST FULL SCAN| IDX_SEXO |       |       |            |          |'
+'------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   3 - filter("SEXO"='H')'
+*/
+ 
+ -- Diferencias y conclusiones:
+
+ /*
+Índice B-Tree: Es más eficiente para consultas que requieren acceso a un rango de 
+valores o para consultas que necesitan acceder a filas individuales rápidamente. 
+
+Índice Bitmap: Es más eficiente para consultas que implican operaciones de 
+agregación o que tienen condiciones de igualdad en columnas con baja cardinalidad. 
+*/
+ 
+ -- Eliminar l'índex creat.
+DROP INDEX IDX_SEXO;
+ 
+-- Ejercicio 5
+-- Copiamos tablas de GIISGBD A NUESTRO LOCAL:
+CREATE TABLE ACTORES_BASE AS
+    SELECT
+        *
+    FROM
+        GIISGBD.ACTORES_BASE;
+
+CREATE TABLE PELICULAS_BASE AS
+    SELECT
+        *
+    FROM
+        GIISGBD.PELICULAS_BASE;
+
+CREATE TABLE ACTUACION_BASE AS
+    SELECT
+        *
+    FROM
+        GIISGBD.ACTUACION_BASE;
+
+
+--Consultas a analizar
+SELECT
+    A.NOM,
+    A.SEXO
+FROM
+    GIISGBD.ACTORES_BASE   A
+WHERE
+    EXISTS (
+        SELECT
+            *
+        FROM
+            GIISGBD.PELICULAS_BASE P,
+            GIISGBD.ACTUACION_BASE ACT
+        WHERE
+            P.OID = ACT.PELI
+            AND P.ANYO = 1980
+            AND A.OID = ACT.ACTOR
+    );
+SELECT
+    A.NOM,
+    A.SEXO
+FROM
+    GIISGBD.ACTORES_BASE   A
+WHERE
+    A.OID IN (
+        SELECT
+            ACT.ACTOR
+        FROM
+            GIISGBD.PELICULAS_BASE P,
+            GIISGBD.ACTUACION_BASE ACT
+        WHERE
+            P.OID = ACT.PELI
+            AND P.ANYO = 1980
+    );
+SELECT
+    A.NOM,
+    A.SEXO
+FROM
+    GIISGBD.ACTORES_BASE   A
+WHERE
+    A.OID = ANY (
+        SELECT
+            ACT.ACTOR
+        FROM
+            GIISGBD.PELICULAS_BASE P,
+            GIISGBD.ACTUACION_BASE ACT
+        WHERE
+            P.OID = ACT.PELI
+            AND P.ANYO = 1980
+    );
+SELECT
+    DISTINCT A.NOM,
+    A.SEXO
+FROM
+    GIISGBD.PELICULAS_BASE P,
+    GIISGBD.ACTUACION_BASE ACT,
+    GIISGBD.ACTORES_BASE   A
+WHERE
+    P.OID = ACT.PELI
+    AND A.OID = ACT.ACTOR
+    AND P.ANYO = 1980;
+
+-- Generar les estadístiques adequades (per a les taules que intervenen en les consultes). 
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES_BASE',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+
+-- Obtenir el pla d'execució de les 4 consultes. 
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA1'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        EXISTS (
+            SELECT
+                *
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+                AND P.ANYO = 1980
+                AND A.OID = ACT.ACTOR
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2277454862'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_SQ_1        | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ITEM_1")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=1980)'
+' '
+*/
+
+-- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA2'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        A.OID IN (
+            SELECT
+                ACT.ACTOR
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+            AND P.ANYO = 1980
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1830521352'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_NSO_1       | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=1980)'
+' '
+*/
+
+-- Consulta 3. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA3'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        A.OID = ANY (
+            SELECT
+                ACT.ACTOR
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+            AND P.ANYO = 1980
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1830521352'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_NSO_1       | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=1980)'
+' '
+*/
+
+-- Consulta 4. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA4'
+    FOR
+    SELECT
+        DISTINCT
+        A.NOM,
+        A.SEXO
+    FROM
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT,
+        ACTORES_BASE   A
+    WHERE
+        P.OID = ACT.PELI
+        AND A.OID = ACT.ACTOR
+        AND P.ANYO = 1980;
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1022368436'
+' '
+'-----------------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |'
+'-----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14365 |  1837K|       |  8355   (1)| 00:00:01 |'
+'|   1 |  HASH UNIQUE         |                | 14365 |  1837K|  2064K|  8355   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN          |                | 14365 |  1837K|       |  7931   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|       |  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |       |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|       |  5335   (1)| 00:00:01 |'
+'|   6 |    TABLE ACCESS FULL | ACTORES_BASE   |   321K|    33M|       |  1399   (1)| 00:00:01 |'
+'-----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   2 - access("A"."OID"="ACT"."ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=1980)'
+' '
+*/
+
+-- Diferencias y conclusiones:
+/*
+Similitudes:
+- Todas las consultas utilizan operaciones de HASH JOIN para unir las tablas PELICULAS_BASE, ACTUACION_BASE y ACTORES_BASE.
+- Las cuatro consultas realizan un TABLE ACCESS FULL en las tres tablas, indicando que no se utilizan índices para estas consultas.
+- Los costos de las consultas son muy similares, con valores alrededor de 7931, reflejando la complejidad similar de las operaciones.
+
+Diferencias:
+- La consulta 4 utiliza una operación adicional de HASH UNIQUE para eliminar duplicados, ya que incluye la cláusula DISTINCT.
+- Las consultas 2 y 3 tienen el mismo Plan hash value, indicando que Oracle ha generado el mismo plan de ejecución para estas dos consultas.
+
+Causas:
+- Las similitudes se deben a que las consultas son conceptualmente idénticas y Oracle optimiza las consultas de manera similar.
+- Las diferencias en la consulta 4 se deben a la necesidad de eliminar duplicados con DISTINCT.
+- El uso de HASH JOIN y TABLE ACCESS FULL indica que no hay índices adecuados para las columnas utilizadas en las condiciones de las
+consultas, o que Oracle ha determinado que el acceso completo a las tablas es más eficiente en este caso.
+*/
+
+-- Canviar el filtre del camp P.ANYO en totes les consultes al valor 2000. Obtenir de nou els 
+-- plans d'execució de les 4 consultes.
+
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA1'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        EXISTS (
+            SELECT
+                *
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+                AND P.ANYO = 2000
+                AND A.OID = ACT.ACTOR
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2277454862'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_SQ_1        | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ITEM_1")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=2000)'
+*/
+
+-- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA2'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        A.OID IN (
+            SELECT
+                ACT.ACTOR
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+            AND P.ANYO = 2000
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1830521352'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_NSO_1       | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=2000)'
+*/
+
+-- Consulta 3. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA3'
+    FOR
+    SELECT
+        A.NOM,
+        A.SEXO
+    FROM
+        ACTORES_BASE   A
+    WHERE
+        A.OID = ANY (
+            SELECT
+                ACT.ACTOR
+            FROM
+                PELICULAS_BASE P,
+                ACTUACION_BASE ACT
+            WHERE
+                P.OID = ACT.PELI
+            AND P.ANYO = 2000
+        );
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1830521352'
+' '
+'---------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'---------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN RIGHT SEMI|                | 14478 |  1724K|  7931   (1)| 00:00:01 |'
+'|   2 |   VIEW               | VW_NSO_1       | 14478 |   183K|  6531   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|  5335   (1)| 00:00:01 |'
+'|   6 |   TABLE ACCESS FULL  | ACTORES_BASE   |   321K|    33M|  1399   (1)| 00:00:01 |'
+'---------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=2000)'
+*/
+
+-- Consulta 4. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA4'
+    FOR
+    SELECT
+        DISTINCT
+        A.NOM,
+        A.SEXO
+    FROM
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT,
+        ACTORES_BASE   A
+    WHERE
+        P.OID = ACT.PELI
+        AND A.OID = ACT.ACTOR
+        AND P.ANYO = 2000;
+SELECT  
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 1022368436'
+' '
+'-----------------------------------------------------------------------------------------------'
+'| Id  | Operation            | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |'
+'-----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT     |                | 14365 |  1837K|       |  8355   (1)| 00:00:01 |'
+'|   1 |  HASH UNIQUE         |                | 14365 |  1837K|  2064K|  8355   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN          |                | 14365 |  1837K|       |  7931   (1)| 00:00:01 |'
+'|*  3 |    HASH JOIN         |                | 14478 |   311K|       |  6531   (1)| 00:00:01 |'
+'|*  4 |     TABLE ACCESS FULL| PELICULAS_BASE |  1409 | 14090 |       |  1193   (1)| 00:00:01 |'
+'|   5 |     TABLE ACCESS FULL| ACTUACION_BASE |  1196K|    13M|       |  5335   (1)| 00:00:01 |'
+'|   6 |    TABLE ACCESS FULL | ACTORES_BASE   |   321K|    33M|       |  1399   (1)| 00:00:01 |'
+'-----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   2 - access("A"."OID"="ACT"."ACTOR")'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."ANYO"=2000)'
+*/
+
+-- Diferencias y conclusiones:
+/*
+Similitudes:
+- Los planes de ejecución siguen utilizando HASH JOIN y TABLE ACCESS FULL para unir y acceder a las tablas PELICULAS_BASE, ACTUACION_BASE y ACTORES_BASE.
+- Los costos de las consultas son similares a los anteriores, con valores alrededor de 7931, reflejando una complejidad similar en las operaciones.
+
+Diferencias:
+- No se observan diferencias significativas en los planes de ejecución al cambiar el año a 2000. Los planes de ejecución y los costos permanecen prácticamente iguales.
+
+Motivo:
+- La razón principal es que el cambio en el valor del año no afecta significativamente la estructura de los datos ni la forma en que Oracle optimiza las consultas. 
+*/
+
+-- Ejercicio 6
+-- Vaciamos las tablas principales
+TRUNCATE TABLE ACTORES;
+TRUNCATE TABLE PELICULAS;
+TRUNCATE TABLE ACTUACION;
+-- Copiamos los datos de las tablas de GIISGBD_DATOS1 a nuestras tablas locales
+INSERT INTO ACTORES
+    SELECT
+        *
+    FROM
+        GIISGBD.ACTORES_DATOS1;
+
+INSERT INTO PELICULAS
+    SELECT
+        *
+    FROM
+        GIISGBD.PELICULAS_DATOS1;
+
+INSERT INTO ACTUACION
+    SELECT
+        *
+    FROM
+        GIISGBD.ACTUACION_DATOS1;
+
+-- Borramos estadísticas
+BEGIN
+    DBMS_STATS.DELETE_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES'
+    );
+    DBMS_STATS.DELETE_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'PELICULAS'
+    );
+    DBMS_STATS.DELETE_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTUACION'
+    );
+END;
+
+-- Consultas a analizar:
+SELECT
+    A.NOM,
+    P.TITULO,
+    ACT.PAPEL,
+    P.ANYO
+FROM
+    ACTORES   A,
+    PELICULAS P,
+    ACTUACION ACT
+WHERE
+    A.OID = ACT.ACTOR
+    AND P.OID = ACT.PELI
+    AND SEXO = 'H'
+    AND P.TITULO LIKE 'Lost%';
+
+SELECT
+    A.NOM,
+    P.TITULO,
+    ACT.PAPEL,
+    P.ANYO
+FROM
+    ACTORES_BASE   A,
+    PELICULAS_BASE P,
+    ACTUACION_BASE ACT
+WHERE
+    A.OID = ACT.ACTOR
+    AND P.OID = ACT.PELI
+    AND SEXO = 'H'
+    AND P.TITULO LIKE 'Lost%';
+
+SELECT
+    A.NOM,
+    P.TITULO,
+    ACT.PAPEL,
+    P.ANYO
+FROM
+    ACTORES_BASE   A,
+    PELICULAS_BASE P,
+    ACTUACION_BASE ACT
+WHERE
+    A.OID = ACT.ACTOR
+    AND P.OID = ACT.PELI
+    AND SEXO = 'H'
+    AND P.TITULO LIKE '%Empire%';
+-- Generamos estadísticas para las tablas
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTORES',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'PELICULAS',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'ACTUACION',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+
+-- Obtenemos los planes de ejecución de las consultas
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA1'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES   A,
+        PELICULAS P,
+        ACTUACION ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE 'Lost%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 3398256115'
+' '
+'-----------------------------------------------------------------------------------'
+'| Id  | Operation             | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-----------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT      |           |    14 |  6006 |    29   (0)| 00:00:01 |'
+'|*  1 |  HASH JOIN            |           |    14 |  6006 |    29   (0)| 00:00:01 |'
+'|   2 |   TABLE ACCESS FULL   | ACTUACION |  2500 |   270K|    13   (0)| 00:00:01 |'
+'|   3 |   MERGE JOIN CARTESIAN|           |  1382 |   429K|    16   (0)| 00:00:01 |'
+'|*  4 |    TABLE ACCESS FULL  | PELICULAS |     1 |   210 |     3   (0)| 00:00:01 |'
+'|   5 |    BUFFER SORT        |           |  1382 |   145K|    13   (0)| 00:00:01 |'
+'|*  6 |     TABLE ACCESS FULL | ACTORES   |  1382 |   145K|    13   (0)| 00:00:01 |'
+'-----------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR" AND "P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."TITULO" LIKE 'Lost%')'
+'   6 - filter("SEXO"='H')'
+*/
+
+-- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA2'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES_BASE   A,
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE 'Lost%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 3843852525'
+' '
+'--------------------------------------------------------------------------------------'
+'| Id  | Operation           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'--------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT    |                |     6 |  2586 |  7933   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN          |                |     6 |  2586 |  7933   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN         |                |    11 |  3542 |  6532   (1)| 00:00:01 |'
+'|*  3 |    TABLE ACCESS FULL| PELICULAS_BASE |     1 |   210 |  1193   (1)| 00:00:01 |'
+'|   4 |    TABLE ACCESS FULL| ACTUACION_BASE |  1196K|   127M|  5336   (1)| 00:00:01 |'
+'|*  5 |   TABLE ACCESS FULL | ACTORES_BASE   |   160K|    16M|  1401   (1)| 00:00:01 |'
+'--------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR")'
+'   2 - access("P"."OID"="ACT"."PELI")'
+'   3 - filter("P"."TITULO" LIKE 'Lost%')'
+'   5 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_7mvm5unxcdxwk55478034" used for this statement'
+*/
+
+-- Consulta 3. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA3'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES_BASE   A,
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE '%Empire%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+    
+-- Resultado:
+/*
+'Plan hash value: 2991472254'
+' '
+'----------------------------------------------------------------------------------------------'
+'| Id  | Operation           | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |'
+'----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT    |                | 36272 |    14M|       | 10007   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN          |                | 36272 |    14M|    18M| 10007   (1)| 00:00:01 |'
+'|*  2 |   TABLE ACCESS FULL | ACTORES_BASE   |   160K|    16M|       |  1401   (1)| 00:00:01 |'
+'|*  3 |   HASH JOIN         |                | 73115 |    22M|       |  6532   (1)| 00:00:01 |'
+'|*  4 |    TABLE ACCESS FULL| PELICULAS_BASE |  7116 |  1459K|       |  1193   (1)| 00:00:01 |'
+'|   5 |    TABLE ACCESS FULL| ACTUACION_BASE |  1196K|   127M|       |  5336   (1)| 00:00:01 |'
+'----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR")'
+'   2 - filter("SEXO"='H')'
+'   3 - access("P"."OID"="ACT"."PELI")'
+'   4 - filter("P"."TITULO" LIKE '%Empire%')'
+*/
+
+-- Proposar les millores necessàries perquè les consultes s'executen de manera més eficient. 
+/*
+Crear índices sobre las columnas relevantes:
+- Crear índices sobre las columnas OID de las tablas ACTORES_BASE, PELICULAS_BASE y ACTUACION_BASE.
+- Crear índices sobre las columnas SEXO de la taula ACTORES_BASE.
+- Crear índices sobre las columnas TITULO de la taula PELICULAS_BASE.
+*/
+
+-- Crear índexs sobre les columnes rellevants
+CREATE INDEX IDX_ACTORES_OID ON ACTORES_BASE (OID);
+CREATE INDEX IDX_PELICULAS_OID ON PELICULAS_BASE (OID);
+CREATE INDEX IDX_ACTUACION_OID_ACTOR ON ACTUACION_BASE (ACTOR);
+CREATE INDEX IDX_ACTUACION_OID_PELI ON ACTUACION_BASE (PELI);
+CREATE INDEX IDX_ACTORES_SEXO ON ACTORES_BASE (SEXO);
+CREATE INDEX IDX_PELICULAS_TITULO ON PELICULAS_BASE (TITULO);
+
+-- Generar estadístiques per a les taules i els índexs
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(OWNNAME => 'GIISGBD109', TABNAME => 'ACTORES_BASE', CASCADE => TRUE, FORCE => TRUE);
+    DBMS_STATS.GATHER_TABLE_STATS(OWNNAME => 'GIISGBD109', TABNAME => 'PELICULAS_BASE', CASCADE => TRUE, FORCE => TRUE);
+    DBMS_STATS.GATHER_TABLE_STATS(OWNNAME => 'GIISGBD109', TABNAME => 'ACTUACION_BASE', CASCADE => TRUE, FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_ACTORES_OID', FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_PELICULAS_OID', FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_ACTUACION_OID_ACTOR', FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_ACTUACION_OID_PELI', FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_ACTORES_SEXO', FORCE => TRUE);
+    DBMS_STATS.GATHER_INDEX_STATS(OWNNAME => 'GIISGBD109', INDNAME => 'IDX_PELICULAS_TITULO', FORCE => TRUE);
+END;
+/
+
+-- Obtenir els plans d'execució de les consultes
+-- Consulta 1. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA1'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES_BASE   A,
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE 'Lost%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Consulta 2. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA2'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES_BASE   A,
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE 'Lost%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Consulta 3. Plano de ejecución.
+EXPLAIN PLAN
+    SET STATEMENT_ID = 'CONSULTA3'
+    FOR
+    SELECT
+        A.NOM,
+        P.TITULO,
+        ACT.PAPEL,
+        P.ANYO
+    FROM
+        ACTORES_BASE   A,
+        PELICULAS_BASE P,
+        ACTUACION_BASE ACT
+    WHERE
+        A.OID = ACT.ACTOR
+        AND P.OID = ACT.PELI
+        AND SEXO = 'H'
+        AND P.TITULO LIKE '%Empire%';
+SELECT
+    *
+FROM
+    TABLE(DBMS_XPLAN.DISPLAY);
+
+-- RESULTADOS:
+--Consulta 1:
+/*
+'Plan hash value: 3843852525'
+' '
+'--------------------------------------------------------------------------------------'
+'| Id  | Operation           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'--------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT    |                |     7 |  3017 |  7933   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN          |                |     7 |  3017 |  7933   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN         |                |    11 |  3542 |  6532   (1)| 00:00:01 |'
+'|*  3 |    TABLE ACCESS FULL| PELICULAS_BASE |     1 |   210 |  1193   (1)| 00:00:01 |'
+'|   4 |    TABLE ACCESS FULL| ACTUACION_BASE |  1196K|   127M|  5336   (1)| 00:00:01 |'
+'|*  5 |   TABLE ACCESS FULL | ACTORES_BASE   |   202K|    21M|  1401   (1)| 00:00:01 |'
+'--------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR")'
+'   2 - access("P"."OID"="ACT"."PELI")'
+'   3 - filter("P"."TITULO" LIKE 'Lost%')'
+'   5 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_7mvm5unxcdxwk55478034" used for this statement'
+*/
+
+--Consulta 2:
+/*
+'Plan hash value: 3843852525'
+' '
+'--------------------------------------------------------------------------------------'
+'| Id  | Operation           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |'
+'--------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT    |                |     7 |  3017 |  7933   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN          |                |     7 |  3017 |  7933   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN         |                |    11 |  3542 |  6532   (1)| 00:00:01 |'
+'|*  3 |    TABLE ACCESS FULL| PELICULAS_BASE |     1 |   210 |  1193   (1)| 00:00:01 |'
+'|   4 |    TABLE ACCESS FULL| ACTUACION_BASE |  1196K|   127M|  5336   (1)| 00:00:01 |'
+'|*  5 |   TABLE ACCESS FULL | ACTORES_BASE   |   202K|    21M|  1401   (1)| 00:00:01 |'
+'--------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR")'
+'   2 - access("P"."OID"="ACT"."PELI")'
+'   3 - filter("P"."TITULO" LIKE 'Lost%')'
+'   5 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - SQL plan baseline "SQL_PLAN_7mvm5unxcdxwk55478034" used for this statement'
+*/
+
+--Consulta 3:
+/*
+'Plan hash value: 3843852525'
+' '
+'----------------------------------------------------------------------------------------------'
+'| Id  | Operation           | Name           | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |'
+'----------------------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT    |                | 45673 |    18M|       | 10246   (1)| 00:00:01 |'
+'|*  1 |  HASH JOIN          |                | 45673 |    18M|    23M| 10246   (1)| 00:00:01 |'
+'|*  2 |   HASH JOIN         |                | 73115 |    22M|       |  6532   (1)| 00:00:01 |'
+'|*  3 |    TABLE ACCESS FULL| PELICULAS_BASE |  7116 |  1459K|       |  1193   (1)| 00:00:01 |'
+'|   4 |    TABLE ACCESS FULL| ACTUACION_BASE |  1196K|   127M|       |  5336   (1)| 00:00:01 |'
+'|*  5 |   TABLE ACCESS FULL | ACTORES_BASE   |   202K|    21M|       |  1401   (1)| 00:00:01 |'
+'----------------------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - access("A"."OID"="ACT"."ACTOR")'
+'   2 - access("P"."OID"="ACT"."PELI")'
+'   3 - filter("P"."TITULO" LIKE '%Empire%')'
+'   5 - filter("SEXO"='H')'
+' '
+'Note'
+'-----'
+'   - this is an adaptive plan'
+*/
+
+-- Eliminar las tablas:
+DROP TABLE ACTORES;
+DROP TABLE PELICULAS;
+DROP TABLE ACTUACION;
+DROP TABLE ACTORES_BASE;
+DROP TABLE PELICULAS_BASE;
+DROP TABLE ACTUACION_BASE;
+
+
+
