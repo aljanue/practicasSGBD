@@ -556,4 +556,148 @@ END;
 se utilizan estadísticas precisas.
 */
 
+-- Ejercicio 3
+SELECT * FROM PELICULAS WHERE ANYO=1960; 
+SELECT * FROM PELICULAS WHERE ANYO<1960; 
+SELECT * FROM PELICULAS WHERE ANYO>1960; 
+SELECT * FROM PELICULAS WHERE ANYO<>1960;
 
+-- Borramos las estadísticas
+BEGIN
+    DBMS_STATS.DELETE_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'PELICULAS'
+    );
+END;
+
+-- Obtenenemos planos de ejecución sin estadísticas:
+-- Plano de ejecución de la consulta 1
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS
+WHERE ANYO = 1960;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |    70 | 15960 |   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |    70 | 15960 |   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"=1960)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+'   - SQL plan baseline "SQL_PLAN_1jdpsryxmw9bbd6672d41" used for this statement'
+*/
+
+-- Plano de ejecución de la consulta 2
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS
+WHERE ANYO < 1960;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  4129 |   919K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  4129 |   919K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"<1960)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+'   - SQL plan baseline "SQL_PLAN_311qg5amb8st0d6672d41" used for this statement'
+*/
+
+-- Plano de ejecución de la consulta 3
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS
+WHERE ANYO > 1960;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           |  7042 |  1567K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS |  7042 |  1567K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO">1960)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+*/
+
+-- Plano de ejecución de la consulta 4
+EXPLAIN PLAN FOR
+SELECT *
+FROM PELICULAS
+WHERE ANYO <> 1960;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY);
+
+-- Resultado:
+/*
+'Plan hash value: 2378278331'
+' '
+'-------------------------------------------------------------------------------'
+'| Id  | Operation         | Name      | Rows  | Bytes | Cost (%CPU)| Time     |'
+'-------------------------------------------------------------------------------'
+'|   0 | SELECT STATEMENT  |           | 11170 |  2487K|   102   (0)| 00:00:01 |'
+'|*  1 |  TABLE ACCESS FULL| PELICULAS | 11170 |  2487K|   102   (0)| 00:00:01 |'
+'-------------------------------------------------------------------------------'
+' '
+'Predicate Information (identified by operation id):'
+'---------------------------------------------------'
+' '
+'   1 - filter("ANYO"<>1960)'
+' '
+'Note'
+'-----'
+'   - dynamic statistics used: dynamic sampling (level=2)'
+*/
+
+-- Creamos estadísticas
+BEGIN
+    DBMS_STATS.GATHER_TABLE_STATS(
+        OWNNAME=>'GIISGBD109',
+        TABNAME=>'PELICULAS',
+        CASCADE=>TRUE,
+        FORCE=>TRUE
+    );
+END;
+
+-- Volver a obtener plano de ejecución
+-- Resultado CONSULTA 1:
